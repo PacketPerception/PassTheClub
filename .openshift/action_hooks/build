@@ -1,0 +1,13 @@
+#!/bin/bash
+# This is a simple build script and will be executed on your CI system if
+# available.  Otherwise it will execute while your application is stopped
+# before the deploy step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+export PATH=$OPENSHIFT_DATA_DIR/bin:$PATH
+$OPENSHIFT_DATA_DIR/bin/pip install -r $OPENSHIFT_REPO_DIR/requirements.txt
+
+echo "Executing 'python ${OPENSHIFT_REPO_DIR}passtheclub/manage.py migrate'"
+$OPENSHIFT_DATA_DIR/bin/python ${OPENSHIFT_REPO_DIR}passtheclub/manage.py migrate --noinput | tee ${OPENSHIFT_LOG_DIR}/app_migrate.log
+
+echo "Executing 'python ${OPENSHIFT_REPO_DIR}passtheclub/manage.py collectstatic --noinput'"
+$OPENSHIFT_DATA_DIR/bin/python ${OPENSHIFT_REPO_DIR}passtheclub/manage.py collectstatic --noinput &> ${OPENSHIFT_LOG_DIR}/collectstatic.log

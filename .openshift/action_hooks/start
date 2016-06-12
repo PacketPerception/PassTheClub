@@ -2,4 +2,10 @@
 # The logic to start up your application should be put in this
 # script. The application will work only if it binds to
 # $OPENSHIFT_DIY_IP:8080
-nohup $OPENSHIFT_REPO_DIR/diy/testrubyserver.rb $OPENSHIFT_DIY_IP $OPENSHIFT_REPO_DIR/diy |& /usr/bin/logshifter -tag diy &
+APP_NAME='passtheclub'
+
+cd $OPENSHIFT_REPO_DIR/$APP_NAME
+$OPENSHIFT_DATA_DIR/bin/uwsgi -s $OPENSHIFT_DIY_IP:$OPENSHIFT_DIY_PORT \
+    --socket-protocol http --module project.wsgi:application \
+    --pp $OPENSHIFT_REPO_DIR/$APP_NAME -d $OPENSHIFT_DIY_LOG_DIR/app.log \
+    --pidfile $OPENSHIFT_TMP_DIR/uwsgi.pid

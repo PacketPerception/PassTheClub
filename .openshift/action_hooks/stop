@@ -1,10 +1,14 @@
 #!/bin/bash
+export PATH=$OPENSHIFT_DATA_DIR/bin:$PATH
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
 
-# The logic to stop your application should be put in this script.
-if [ -z "$(ps -ef | grep testrubyserver.rb | grep -v grep)" ]
-then
-    client_result "Application is already stopped"
+if [ -f $OPENSHIFT_TMP_DIR/uwsgi.pid ]; then
+    kill `cat $OPENSHIFT_TMP_DIR/uwsgi.pid`
 else
-    kill `ps -ef | grep testrubyserver.rb | grep -v grep | awk '{ print $2 }'` > /dev/null 2>&1
+    if [ -z "$(ps -ef | grep uwsgi | grep -v grep)" ]; then
+        client_result "Application is already stopped"
+    else
+        kill `ps -ef | grep uwsgi | grep -v grep | awk '{ print $2 }'` > /dev/null 2>&1
+    fi
 fi
+exit 0

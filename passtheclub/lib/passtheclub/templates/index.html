@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% load bootstrap3 %}
+
+{% block content %}
+<form id='siteswap-form' action="/" method="post" class="form">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">Validate</button>
+    {% endbuttons %}
+</form>
+<table id="results" class="table">
+
+</table>
+{% endblock %}
+
+{% block extrabody %}
+<script type="text/javascript">
+$('#siteswap-form').on('submit', function(event){
+    event.preventDefault();
+    console.log("form submitted")  // sanity check
+
+    $.ajax({
+        url : "/", // the endpoint
+        type : "POST", // http method
+        data : $("#siteswap-form").serialize(),
+        success : function(json) {
+            json = JSON.parse(json);
+            console.log(json); // log the returned json to the console
+
+            $("#results").empty();
+            $.each(json, function(key, data) {
+                console.log(key, data);
+                $("#results").append('<tr><td>' + key + '</td><td>' + JSON.stringify(data) + '</td></tr>');
+            });
+        },
+
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+        }
+    });
+});
+</script>
+{% endblock %}

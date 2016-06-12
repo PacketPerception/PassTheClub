@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# This is a simple script and will be executed on your CI system if
+# available.  Otherwise it will execute while your application is stopped
+# before the build step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+
+# set path
+export PATH=$OPENSHIFT_DATA_DIR/bin:$PATH
+
+if [ ! -d $OPENSHIFT_DATA_DIR/bin ]; then
+  if [ "$OPENSHIFT_DATA_DIR/bin/python -V" != 'Python 3.5.1' ]; then
+    # install python 3.5.1
+    cd $OPENSHIFT_TMP_DIR
+    wget https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tgz
+    tar zxf Python-3.5.1.tgz
+    cd Python-3.5.1
+    ./configure --prefix=$OPENSHIFT_DATA_DIR
+    make install
+    ln -s $OPENSHIFT_DATA_DIR/bin/python3 $OPENSHIFT_DATA_DIR/bin/python
+    ln -s $OPENSHIFT_DATA_DIR/bin/pip3 $OPENSHIFT_DATA_DIR/bin/pip
+  fi
+
+  # upgrade pip
+  pip install -U pip
+
+  # install uwsgi
+  pip install uwsgi
+
+  # cleanup
+  rm -rf $OPENSHIFT_TMP_DIR/*
+fi
