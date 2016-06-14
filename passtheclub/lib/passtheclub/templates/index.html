@@ -52,10 +52,15 @@ $('#siteswap-form').on('submit', function(event){
 
             $("#results").empty();
             $.each(json, function(key, data) {
-                data = syntaxHighlight(JSON.stringify(data, undefined, 4));
-                if (key == 'pattern')
-                    data = '<pre>' + data + '</pre>';
-                $("#results").append('<tr><td>' + key + '</td><td>' + data + '</td></tr>');
+                if (key == 'pattern') {
+                    $.each(data, function(k, d) {
+                        d = syntaxHighlight(JSON.stringify(d, undefined, 4));
+                        $("#results").append('<tr><td>' + k + '</td><td>' + d + '</td></tr>');
+                    });
+                } else {
+                    data = syntaxHighlight(JSON.stringify(data, undefined, 4));
+                    $("#results").append('<tr><td>' + key + '</td><td>' + data + '</td></tr>');
+                }
             });
         },
 
